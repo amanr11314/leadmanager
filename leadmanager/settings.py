@@ -40,6 +40,7 @@ INSTALLED_APPS = [
 
     'rest_framework',
     'leads.apps.LeadsConfig',
+    'frontend.apps.FrontendConfig'
 ]
 
 MIDDLEWARE = [
