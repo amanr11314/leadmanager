@@ -1,4 +1,4 @@
-import React, { Fragment, useEffect, useContext } from "react";
+import React, { Fragment } from "react";
 import MyLeadForm from "./Form";
 import Leads from "./Leads";
 

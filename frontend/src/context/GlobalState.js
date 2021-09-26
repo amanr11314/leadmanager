@@ -1,15 +1,37 @@
 import React, { useReducer } from "react";
 import axios from "axios";
 
-import { GET_LEADS, DELETE_LEAD, ADD_LEAD } from "../actions/types";
+import {
+  GET_LEADS,
+  DELETE_LEAD,
+  ADD_LEAD,
+  GET_ERRORS,
+  RESET_ERRORS,
+  CREATE_MESSAGE,
+} from "../actions/types";
 import GlobalContext from "./lead-context";
 import { leadreducer } from "../reducers/lead_reducer";
+import { errorreducer } from "../reducers/errors";
+import { messagereducer } from "../reducers/messages";
 
 const GlobalState = (props) => {
   const initialLeads = {
     leads: [],
   };
   const [leadState, dispatch] = useReducer(leadreducer, initialLeads);
+
+  const initialError = {
+    msg: {},
+    status: null,
+  };
+  const [errorState, dispatchError] = useReducer(errorreducer, initialError);
+
+  const initialMessage = {};
+
+  const [messageState, dispatchMessage] = useReducer(
+    messagereducer,
+    initialMessage
+  );
 
   const getLeads = () => {
     axios
@@ -29,6 +51,7 @@ const GlobalState = (props) => {
     axios
       .delete(`/api/leads/${id}/`)
       .then((res) => {
+        createMessage({ deleteLead: "Lead Deleted" });
         dispatch({
           type: DELETE_LEAD,
           payload: id,
@@ -43,15 +66,43 @@ const GlobalState = (props) => {
     axios
       .post("/api/leads/", lead)
       .then((res) => {
+        createMessage({ addLead: "Lead Added" });
         dispatch({
           type: ADD_LEAD,
           payload: res.data,
         });
       })
       .catch((err) => {
-        console.log(err);
+        const errors = {
+          msg: err.response.data,
+          status: err.response.status,
+        };
+        dispatchError({
+          type: GET_ERRORS,
+          payload: errors,
+        });
       });
   };
+  const resetError = () => {
+    dispatchError({
+      type: RESET_ERRORS,
+      payload: initialError,
+    });
+  };
+
+  const createMessage = (msg) => {
+    dispatchMessage({
+      type: CREATE_MESSAGE,
+      payload: msg,
+    });
+  };
+
+  // const getMessages = () => {
+  //   dispatchMessage({
+  //     type: GET_MESSAGES,
+  //     payload: messageState,
+  //   });
+  // };
 
   return (
     <GlobalContext.Provider
@@ -60,6 +111,10 @@ const GlobalState = (props) => {
         getLeads: getLeads,
         deleteLead: deleteLead,
         addLead: addLead,
+        errors: errorState,
+        resetError: resetError,
+        messageState: messageState,
+        createMessage: createMessage,
       }}
     >
       {props.children}

@@ -13,7 +13,6 @@ function MyLeadForm() {
 
   const handleClick = (e) => {
     e.preventDefault();
-    console.log(values);
     const { name, email, message } = values;
     const lead = { name, email, message };
 

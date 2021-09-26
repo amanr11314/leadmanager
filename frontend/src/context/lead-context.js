@@ -5,4 +5,12 @@ export default React.createContext({
   getLeads: () => {},
   deleteLead: (leadID) => {},
   addLead: (lead) => {},
+  errors: {
+    msg: {},
+    status: null,
+  },
+  resetError: () => {},
+  messageState: {},
+  createMessage: (msg) => {},
+  // getMessages: () => {},
 });

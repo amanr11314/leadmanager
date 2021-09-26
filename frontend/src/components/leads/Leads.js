@@ -5,7 +5,6 @@ const Leads = () => {
   const context = useContext(GlobalContext);
   useEffect(() => {
     context.getLeads();
-    console.log("leads rerendered");
   }, []);
   return (
     <Fragment>
