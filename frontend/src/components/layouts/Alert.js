@@ -13,7 +13,7 @@ function Alert() {
 
   useEffect(() => {
     if (!!context.errors.status) {
-      console.log(context.errors);
+      console.log("context.errors");
       const error = context.errors;
       if (error.msg.name)
         alert.error(`Name: ${error.msg.name.join()}`, options);
@@ -21,6 +21,7 @@ function Alert() {
         alert.error(`Email: ${error.msg.email.join()}`, options);
       if (error.msg.message)
         alert.error(`Message: ${error.msg.message.join()}`, options);
+      if (error.msg.detail) alert.error(`Error: ${error.msg.detail}`, options);
 
       context.resetError();
     }

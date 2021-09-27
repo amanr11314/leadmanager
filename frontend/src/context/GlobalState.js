@@ -42,9 +42,7 @@ const GlobalState = (props) => {
           payload: res.data,
         });
       })
-      .catch((err) => {
-        console.log(err);
-      });
+      .catch((err) => returnError(err));
   };
 
   const deleteLead = (id) => {
@@ -57,9 +55,7 @@ const GlobalState = (props) => {
           payload: id,
         });
       })
-      .catch((err) => {
-        console.log(err);
-      });
+      .catch((err) => returnError(err));
   };
 
   const addLead = (lead) => {
@@ -72,21 +68,23 @@ const GlobalState = (props) => {
           payload: res.data,
         });
       })
-      .catch((err) => {
-        const errors = {
-          msg: err.response.data,
-          status: err.response.status,
-        };
-        dispatchError({
-          type: GET_ERRORS,
-          payload: errors,
-        });
-      });
+      .catch((err) => returnError(err));
   };
   const resetError = () => {
     dispatchError({
       type: RESET_ERRORS,
       payload: initialError,
+    });
+  };
+
+  const returnError = (err) => {
+    const errors = {
+      msg: err.response.data,
+      status: err.response.status,
+    };
+    dispatchError({
+      type: GET_ERRORS,
+      payload: errors,
     });
   };
 
