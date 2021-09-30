@@ -28,6 +28,7 @@ function Alert() {
   }, [context.errors]);
 
   useEffect(() => {
+    console.log("messagestate useffect called");
     if (!!context.messageState) {
       const message = context.messageState;
       if (message.deleteLead) alert.success(message.deleteLead, options);

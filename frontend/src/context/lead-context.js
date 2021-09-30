@@ -12,5 +12,11 @@ export default React.createContext({
   resetError: () => {},
   messageState: {},
   createMessage: (msg) => {},
-  // getMessages: () => {},
+  auth: {
+    token: "",
+    isAuthenticated: null,
+    isLoading: false,
+    user: null,
+  },
+  loadUser: () => {},
 });

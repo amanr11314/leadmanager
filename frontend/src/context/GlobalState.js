@@ -8,31 +8,22 @@ import {
   GET_ERRORS,
   RESET_ERRORS,
   CREATE_MESSAGE,
+  USER_LOADED,
+  USER_LOADING,
+  AUTH_ERROR,
 } from "../actions/types";
 import GlobalContext from "./lead-context";
 import { leadreducer } from "../reducers/lead_reducer";
 import { errorreducer } from "../reducers/errors";
 import { messagereducer } from "../reducers/messages";
+import { auth_reducer } from "../reducers/auth_reducers";
 
 const GlobalState = (props) => {
+  //LEADS
   const initialLeads = {
     leads: [],
   };
   const [leadState, dispatch] = useReducer(leadreducer, initialLeads);
-
-  const initialError = {
-    msg: {},
-    status: null,
-  };
-  const [errorState, dispatchError] = useReducer(errorreducer, initialError);
-
-  const initialMessage = {};
-
-  const [messageState, dispatchMessage] = useReducer(
-    messagereducer,
-    initialMessage
-  );
-
   const getLeads = () => {
     axios
       .get("/api/leads/")
@@ -70,6 +61,13 @@ const GlobalState = (props) => {
       })
       .catch((err) => returnError(err));
   };
+
+  //ERRORS
+  const initialError = {
+    msg: {},
+    status: null,
+  };
+  const [errorState, dispatchError] = useReducer(errorreducer, initialError);
   const resetError = () => {
     dispatchError({
       type: RESET_ERRORS,
@@ -88,11 +86,65 @@ const GlobalState = (props) => {
     });
   };
 
+  //MESSAGES
+  const initialMessage = {};
+
+  const [messageState, dispatchMessage] = useReducer(
+    messagereducer,
+    initialMessage
+  );
+
   const createMessage = (msg) => {
+    console.log("create message called!!");
     dispatchMessage({
       type: CREATE_MESSAGE,
       payload: msg,
     });
+  };
+
+  //AUTHENTICATION
+  const initialAuthState = {
+    token: localStorage.getItem("token"),
+    isAuthenticated: null,
+    isLoading: false,
+    user: null,
+  };
+  const [authState, dispatchAuth] = useReducer(auth_reducer, initialAuthState);
+
+  //CHECK TOKEN & LOAD USER
+  const loadUser = () => {
+    //User Loading
+    dispatchAuth({
+      type: USER_LOADING,
+    });
+    //Get token from state
+    const token = authState.token;
+
+    //Headers
+    const config = {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    };
+
+    //If token add to headers config
+    if (token) {
+      config.headers["Authorization"] = "Token " + token;
+    }
+    axios
+      .get("/api/auth/user", config)
+      .then((res) => {
+        dispatchAuth({
+          type: USER_LOADED,
+          payload: res.data,
+        });
+      })
+      .catch((err) => {
+        returnError(err);
+        dispatchAuth({
+          type: AUTH_ERROR,
+        });
+      });
   };
 
   // const getMessages = () => {
@@ -113,6 +165,8 @@ const GlobalState = (props) => {
         resetError: resetError,
         messageState: messageState,
         createMessage: createMessage,
+        auth: authState,
+        loadUser: loadUser,
       }}
     >
       {props.children}
