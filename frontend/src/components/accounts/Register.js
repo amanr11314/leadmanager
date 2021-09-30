@@ -15,14 +15,18 @@ export default function Register() {
   const handleOnSubmit = (e) => {
     e.preventDefault();
     const { username, email, password, password2 } = values;
-    console.log(values);
     if (password !== password2) {
-      console.log("Passwords don't match");
       context.createMessage({ passwordNotMatch: "Passwords do not match" });
     } else {
-      console.log("Passwords do match");
+      const newUser = {
+        username,
+        password,
+        email,
+      };
+      context.register(newUser);
     }
   };
+  if (context.auth.isAuthenticated) return <Redirect to="/" />;
   return (
     <div className="col-md-6 m-auto">
       <div className="card card-body mt-5">

@@ -11,6 +11,12 @@ import {
   USER_LOADED,
   USER_LOADING,
   AUTH_ERROR,
+  LOGIN_FAIL,
+  LOGIN_SUCCESS,
+  LOGOUT_SUCCESS,
+  LOGOUT_FAIL,
+  REGISTER_SUCCESS,
+  REGISTER_FAIL,
 } from "../actions/types";
 import GlobalContext from "./lead-context";
 import { leadreducer } from "../reducers/lead_reducer";
@@ -26,7 +32,7 @@ const GlobalState = (props) => {
   const [leadState, dispatch] = useReducer(leadreducer, initialLeads);
   const getLeads = () => {
     axios
-      .get("/api/leads/")
+      .get("/api/leads/", tokenConfig(authState))
       .then((res) => {
         dispatch({
           type: GET_LEADS,
@@ -38,7 +44,7 @@ const GlobalState = (props) => {
 
   const deleteLead = (id) => {
     axios
-      .delete(`/api/leads/${id}/`)
+      .delete(`/api/leads/${id}/`, tokenConfig(authState))
       .then((res) => {
         createMessage({ deleteLead: "Lead Deleted" });
         dispatch({
@@ -51,7 +57,7 @@ const GlobalState = (props) => {
 
   const addLead = (lead) => {
     axios
-      .post("/api/leads/", lead)
+      .post("/api/leads/", lead, tokenConfig(authState))
       .then((res) => {
         createMessage({ addLead: "Lead Added" });
         dispatch({
@@ -95,7 +101,6 @@ const GlobalState = (props) => {
   );
 
   const createMessage = (msg) => {
-    console.log("create message called!!");
     dispatchMessage({
       type: CREATE_MESSAGE,
       payload: msg,
@@ -117,22 +122,9 @@ const GlobalState = (props) => {
     dispatchAuth({
       type: USER_LOADING,
     });
-    //Get token from state
-    const token = authState.token;
 
-    //Headers
-    const config = {
-      headers: {
-        "Content-Type": "application/json",
-      },
-    };
-
-    //If token add to headers config
-    if (token) {
-      config.headers["Authorization"] = "Token " + token;
-    }
     axios
-      .get("/api/auth/user", config)
+      .get("/api/auth/user", tokenConfig(authState))
       .then((res) => {
         dispatchAuth({
           type: USER_LOADED,
@@ -147,12 +139,87 @@ const GlobalState = (props) => {
       });
   };
 
-  // const getMessages = () => {
-  //   dispatchMessage({
-  //     type: GET_MESSAGES,
-  //     payload: messageState,
-  //   });
-  // };
+  //LOGIN USER
+  const login = (username, password) => {
+    dispatchAuth({
+      type: USER_LOADING,
+    });
+
+    //Headers
+    const config = {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    };
+
+    //Request Body
+    const body = JSON.stringify({
+      username,
+      password,
+    });
+
+    axios
+      .post("/api/auth/login", body, config)
+      .then((res) => {
+        dispatchAuth({
+          type: LOGIN_SUCCESS,
+          payload: res.data,
+        });
+      })
+      .catch((err) => {
+        returnError(err);
+        dispatchAuth({
+          type: LOGIN_FAIL,
+        });
+      });
+  };
+
+  //LOGOUT USER
+  const logout = () => {
+    axios
+      .post("/api/auth/logout/", null, tokenConfig(authState))
+      .then((res) => {
+        dispatchAuth({
+          type: LOGOUT_SUCCESS,
+          payload: res.data,
+        });
+      })
+      .catch((err) => {
+        returnError(err);
+      });
+  };
+
+  //REGISTER USER
+  const register = ({ username, password, email }) => {
+    //Headers
+    const config = {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    };
+
+    //Request Body
+    const body = JSON.stringify({
+      username,
+      password,
+      email,
+    });
+
+    axios
+      .post("/api/auth/register", body, config)
+      .then((res) => {
+        dispatchAuth({
+          type: REGISTER_SUCCESS,
+          payload: res.data,
+        });
+      })
+      .catch((err) => {
+        returnError(err);
+        dispatchAuth({
+          type: REGISTER_FAIL,
+        });
+      });
+  };
 
   return (
     <GlobalContext.Provider
@@ -167,6 +234,9 @@ const GlobalState = (props) => {
         createMessage: createMessage,
         auth: authState,
         loadUser: loadUser,
+        login: login,
+        logout: logout,
+        register: register,
       }}
     >
       {props.children}
@@ -175,3 +245,21 @@ const GlobalState = (props) => {
 };
 
 export default GlobalState;
+//SetUp config with token - Helper Function
+export const tokenConfig = (getState) => {
+  //Get token from state
+  const token = getState.token;
+
+  //Headers
+  const config = {
+    headers: {
+      "Content-Type": "application/json",
+    },
+  };
+
+  //If token add to headers config
+  if (token) {
+    config.headers["Authorization"] = "Token " + token;
+  }
+  return config;
+};

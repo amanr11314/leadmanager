@@ -12,20 +12,6 @@ const ErrorState = (props) => {
   };
   const [errorState, dispatch] = useReducer(errorreducer, initialState);
 
-  //   const getLeads = () => {
-  //     axios
-  //       .get("/api/leads/")
-  //       .then((res) => {
-  //         dispatch({
-  //           type: GET_LEADS,
-  //           payload: res.data,
-  //         });
-  //       })
-  //       .catch((err) => {
-  //         console.log(err);
-  //       });
-  //   };
-
   return (
     <ErrorContext.Provider value={{}}>{props.children}</ErrorContext.Provider>
   );

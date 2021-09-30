@@ -8,23 +8,14 @@ export default function Login() {
     password: "",
   };
   const [values, handleChange, resetForm] = useForm(initialValues);
-  // const context = useContext(GlobalContext);
+  const context = useContext(GlobalContext);
 
   const handleOnSubmit = (e) => {
     e.preventDefault();
     const { username, password } = values;
-    console.log(username + " " + password);
-    // if (password !== password2) {
-    //   context.createMessage({ passwordNotMatch: "Passwords do not match" });
-    // } else {
-    //   const newUser = {
-    //     username,
-    //     password,
-    //     email,
-    //   };
-    //   this.props.register(newUser);
-    // }
+    context.login(username, password);
   };
+  if (context.auth.isAuthenticated) return <Redirect to="/" />;
   return (
     <div className="col-md-6 m-auto">
       <div className="card card-body mt-5">

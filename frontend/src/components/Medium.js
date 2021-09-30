@@ -13,7 +13,8 @@ import GlobalContext from "../context/lead-context";
 export default function Medium() {
   const context = useContext(GlobalContext);
   useEffect(() => {
-    context.loadUser();
+    //only load user if has token
+    if (context.auth.token) context.loadUser();
   }, []);
   return (
     <Router>

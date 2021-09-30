@@ -19,4 +19,7 @@ export default React.createContext({
     user: null,
   },
   loadUser: () => {},
+  login: (username, password) => {},
+  logout: () => {},
+  register: ({ username, password, email }) => {},
 });

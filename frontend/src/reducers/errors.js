@@ -6,7 +6,6 @@ const initialError = {
 export const errorreducer = (state, action) => {
   switch (action.type) {
     case GET_ERRORS:
-      console.log("GET_ERRORS called!");
       return action.payload;
     case RESET_ERRORS:
       return {
